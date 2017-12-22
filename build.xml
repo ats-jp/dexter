@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="dexter" default="all">
+
+	<path id="project.classpath">
+		<pathelement location="dependencies/servlet-api.jar" />
+		<pathelement location="dependencies/jsp-api.jar" />
+		<pathelement location="dependencies/substrate.jar" />
+	</path>
+
+	<target name="all" depends="cleanup, import, compile">
+		<copy todir="build">
+			<fileset dir="src" includes="**/*.java" />
+			<fileset dir="src" includes="**/*.xml" />
+		</copy>
+		<jar basedir="build" jarfile="dexter.jar" />
+	</target>
+
+	<!--
+	substrate.jar を生成し、使用可能なようにインポートします。
+	-->
+	<target name="import">
+		<ant dir="../substrate" />
+		<copy file="../substrate/substrate.jar" todir="dependencies" />
+	</target>
+
+	<target name="nodeps-jar" depends="cleanup">
+		<ant dir="../substrate" />
+		<copy todir="build">
+			<fileset dir="../substrate/build" />
+		</copy>
+		<antcall target="compile" />
+		<copy todir="build">
+			<fileset dir="src" includes="**/*.java" />
+			<fileset dir="src" includes="**/*.xml" />
+		</copy>
+		<jar basedir="build" jarfile="dexter-nodeps.jar" />
+	</target>
+
+	<target name="javadoc" depends="cleanup, import">
+		<ant dir="../substrate" target="javadoc" />
+		<mkdir dir="substrate-api" />
+		<copy todir="substrate-api">
+			<fileset dir="../liverwort/substrate-api" />
+		</copy>
+
+		<mkdir dir="dexter-api" />
+
+		<javadoc packagenames="jp.ats.dexter.*" sourcepath="src" destdir="dexter-api" windowtitle="Dexter API" doctitle="Dexter API">
+			<classpath refid="project.classpath" />
+			<link offline="true" href="http://java.sun.com/j2se/1.5.0/ja/docs/ja/api/" packagelistLoc="." />
+			<link href="../substrate-api" packagelistLoc="." />
+		</javadoc>
+		<zip zipfile="dexter-api.zip" basedir="dexter-api" />
+	</target>
+
+	<target name="cleanup">
+		<delete dir="build" />
+		<delete file="dependencies/substrate.jar" />
+		<delete file="dexter.jar" />
+		<delete file="dependencies/dexter.jar" />
+		<delete file="dexter-nodeps.jar" />
+		<delete file="dexter-api.zip" />
+	</target>
+
+	<target name="compile">
+		<mkdir dir="build" />
+		<javac srcdir="src" destdir="build" debug="true" optimize="true" deprecation="true" encoding="UTF-8" includeantruntime="false">
+			<classpath refid="project.classpath" />
+			<include name="**/*.java" />
+		</javac>
+		<copy file="src/dexter-version.txt" todir="build" />
+	</target>
+</project>

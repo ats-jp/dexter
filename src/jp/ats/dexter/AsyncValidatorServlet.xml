@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dexterServletResult>
+	<resultAvailable>{0}</resultAvailable>
+	<descriptions>{1}</descriptions>
+	<valid>{2}</valid>
+	<validationMessage>{3}</validationMessage>
+</dexterServletResult>
